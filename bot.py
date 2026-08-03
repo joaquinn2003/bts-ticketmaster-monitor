@@ -33,6 +33,10 @@ USER_AGENT = (
     "(KHTML, like Gecko) Chrome/120.0 Safari/537.36"
 )
 
+# Lineas que cambian solas segun el idioma/ubicacion detectada del visitante
+# (ej. el link de cookies), sin que haya cambiado nada real en la pagina.
+LINEAS_RUIDO = {"Manage my cookies", "Preferencias de cookies"}
+
 
 def log(msg: str) -> None:
     print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}")
@@ -82,6 +86,9 @@ def obtener_datos_evento() -> dict:
                 })
 
         texto_completo = page.locator("body").inner_text()
+        texto_completo = "\n".join(
+            linea for linea in texto_completo.splitlines() if linea not in LINEAS_RUIDO
+        )
         browser.close()
 
     return {"fechas": filas, "texto": texto_completo}
